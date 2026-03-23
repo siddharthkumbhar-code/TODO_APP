@@ -11,7 +11,18 @@ package handlers
 func DeleteTask(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 
-		id := r.URL.Query().Get("id")
+idstr := r.URL.Query().Get("id")
+
+	 if idstr==""{
+		log.Println("Id is required plz provide id")
+		return
+	 }
+
+	 id,err := strconv.Atoi(idstr)
+	 if err!=nil{
+		log.Println("id must be number ")
+		return
+	 }
 
 		query :=`DELETE FROM tasks
 		        WHERE id=?`
