@@ -24,5 +24,5 @@ func SetupRoutes(db *sql.DB) {
 	http.HandleFunc("/getTasksByName",handlers.GetTasksByName(db))
 	http.HandleFunc("/completedTasks",handlers.CompletedTasks(db))
 	http.HandleFunc("/pendingTasks",handlers.PendingTasks(db))
-
+	http.HandleFunc("/users",handlers.GetAllUsers(db))
 }
