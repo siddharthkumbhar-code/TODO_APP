@@ -27,8 +27,6 @@ func SetupRoutes(db *sql.DB) {
 	http.HandleFunc("/task/userid",handlers.GetTaskByUserId(db))
 	http.HandleFunc("/task/status/userid",handlers.GetTask(db))
 	http.HandleFunc("/task/status",handlers.UpdateStatusOfTask(db))
-	http.HandleFunc("/task/name",handlers.GetTasksByName(db))
-	http.HandleFunc("/task/createdAt",handlers.GetTaskByCreatedAt(db))
-	http.HandleFunc("/task/updatedAt",handlers.GetTaskUpdatedAt(db))
+	http.HandleFunc("/tasks",handlers.GetTasksBySorted(db))
 	
 }
