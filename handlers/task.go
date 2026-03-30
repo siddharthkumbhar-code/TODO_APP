@@ -280,3 +280,60 @@ func DeleteTask(db *sql.DB) http.HandlerFunc {
 		})
 	}
 }
+
+func RenameTask(db *sql.DB) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+
+		userid := request.PathValue("userid")
+		taskid := request.PathValue("taskid")
+
+		if userid == "" || taskid == "" {
+			log.Println("userid and taskid  required plz provide ids")
+			return
+		}
+
+		tid, err := strconv.Atoi(taskid)
+		if err != nil {
+			log.Println("Taskid must be integer", err)
+			return
+		}
+
+		uid, err1 := strconv.Atoi(userid)
+		if err1 != nil {
+			log.Println("userid must be integer", err1)
+			return
+		}
+
+		var task models.Task
+		json.NewDecoder(request.Body).Decode(&task)
+
+		query := `UPDATE tasks1 SET NAME=?, updatedAt=CURRENT_TIMESTAMP 
+				WHERE id=? AND userid=?`
+
+		res, err := db.Exec(query, task.NAME, tid, uid)
+
+		if err != nil {
+			log.Println("error while executing the database query", err)
+			return
+		}
+
+		rowsAffected, err := res.RowsAffected()
+
+		if err != nil {
+			log.Println("error in checking rows affected", err)
+			return
+		}
+
+		if rowsAffected == 0 {
+			json.NewEncoder(writer).Encode(map[string]interface{}{
+				"error": "task not found",
+			})
+			return
+		}
+
+		json.NewEncoder(writer).Encode(map[string]interface{}{
+			"message":        "task rename succesfully",
+		})
+
+	}
+}
