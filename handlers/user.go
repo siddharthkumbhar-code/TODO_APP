@@ -119,6 +119,12 @@ func GetUserById(db *sql.DB) http.HandlerFunc {
 		id, err := strconv.Atoi(idstr)
 		if err != nil {
 			log.Println("id must be number")
+			http.Error(writer,"Id must be Number",400)
+			return
+		}
+		if id<=0{
+			http.Error(writer,"Enter a positive value for Userid",400)
+			log.Println("Enter a positivr number for the UserId")
 			return
 		}
 
@@ -128,6 +134,7 @@ func GetUserById(db *sql.DB) http.HandlerFunc {
 
 		if err1 != nil {
 			log.Println("error in the fetching the data")
+			http.Error(writer,"Internal Server Error",500)
 			return
 		}
 		json.NewEncoder(writer).Encode(map[string]interface{}{
