@@ -15,10 +15,9 @@ func SetupRoutes(db *sql.DB) {
 	http.HandleFunc("GET /users/{userid}",handlers.GetUserById(db))
 
 	http.HandleFunc("GET /users/{userid}/tasks",handlers.GetTaskByUserId(db))
-	
 
-	http.HandleFunc("PATCH /task/status",handlers.UpdateStatusOfTask(db))
-	http.HandleFunc("PATCH /users/{userid}/tasks/{taskid}",handlers.RenameTask(db))
+
+	http.HandleFunc("PATCH /users/{userid}/tasks/{taskid}",handlers.UpdateTask(db))
 
 	http.HandleFunc("DELETE /users/{userid}/tasks/{taskid}",handlers.DeleteTask(db))
 
