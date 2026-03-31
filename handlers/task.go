@@ -20,6 +20,31 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 		sortby := request.URL.Query().Get("sortby")
 		order := request.URL.Query().Get("order")
 
+		cursor:= request.URL.Query().Get("cursor")
+		limitstr := request.URL.Query().Get("limit")
+		pagenostr := request.URL.Query().Get("pageno")
+
+		var err error
+        limit:=5
+		pageno:=1
+		if limitstr!=""{
+			parsedlimit, err := strconv.Atoi(limitstr);
+			if err!=nil{
+				log.Println("plz provide valid limit",err)
+				return 
+			}
+			limit=parsedlimit
+		}
+		if pagenostr!=""{
+			parsedpage, err := strconv.Atoi(pagenostr);
+			if err!=nil{
+				log.Println("plz provide valid pageno",err)
+				return 
+			}
+			pageno=parsedpage
+		}
+	      
+
 		if useridstr == "" {
 			log.Println("id required plz!")
 			return
@@ -44,6 +69,11 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 			parameters = append(parameters,status)
 		}
 		
+		if cursor != "" {
+			query += " AND createdAt > ?"
+			parameters = append(parameters, cursor)
+		}
+
 		if validfields[sortby]{
 			query = query + " ORDER BY " + sortby
 			
@@ -54,6 +84,15 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 			}
 		}else{
 			query+= " ORDER BY createdAt DESC"
+		}
+		//pagination
+        if cursor!=""{
+			query+=" LIMIT ? "
+			parameters = append(parameters,limit)
+		}else{
+			offset := (pageno-1)*limit
+			query+=" LIMIT ? OFFSET ?"
+			parameters =append(parameters,limit,offset)
 		}
 		log.Println("Query:", query)
         log.Println("Values:", parameters)
@@ -76,9 +115,12 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		
+         
 		json.NewEncoder(writer).Encode(map[string]interface{}{
 			"message":  "the task of the user are",
 			"tasklist": tasklist,
+			
 		})
 	}
 }
