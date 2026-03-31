@@ -96,7 +96,7 @@ func InsertTask(db *sql.DB) http.HandlerFunc {
 
 		userID, err := strconv.Atoi(userIDStr)
 		if err != nil {
-			log.Println("User id must be positive")
+			log.Println("User id must be valid")
 			http.Error(writer, "invalid userId", http.StatusBadRequest)
 			return
 		}
@@ -151,9 +151,14 @@ func InsertTask(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-
 func DeleteTask(db *sql.DB) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
+
+		if request.Method!=http.MethodDelete{
+			http.Error(writer,"Invalid Method type",405)
+			log.Println("Invalid Method type")
+			return
+		}
 		idstr := request.PathValue("taskid")
 		useridstr := request.PathValue("userid")
 
@@ -167,10 +172,21 @@ func DeleteTask(db *sql.DB) http.HandlerFunc {
 			log.Println("id must be integer", err)
 			return
 		}
+		if id<=0{
+			log.Println("Task id must be positive")
+			http.Error(writer,"Taskid must be positive",400)
+			return
+		}
 
 		userid, err1 := strconv.Atoi(useridstr)
 		if err1 != nil {
 			log.Println("userid must be integer", err1)
+			http.Error(writer,"Invalid user id",400)
+			return
+		}
+		if userid<=0{
+			log.Println("User id must be positive")
+			http.Error(writer,"UserId must be positive",400)
 			return
 		}
 
@@ -180,6 +196,7 @@ func DeleteTask(db *sql.DB) http.HandlerFunc {
 
 		if err != nil {
 			log.Println("error while executing the database query", err)
+			http.Error(writer,"Internal server Error",500)
 			return
 		}
 
@@ -187,6 +204,7 @@ func DeleteTask(db *sql.DB) http.HandlerFunc {
 
 		if err != nil {
 			log.Println("error in checking rows affected", err)
+			http.Error(writer,"failed to process request",400)
 			return
 		}
 
