@@ -14,6 +14,12 @@ import (
 func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
+		if request.Method!=http.MethodGet{
+			http.Error(writer,"Invlaid Method type",405)
+			log.Println("Invalid method type")
+			return
+		}
+
 		var tasklist []models.Task
 		useridstr := request.PathValue("userid")
 		status := request.URL.Query().Get("status")
