@@ -6,13 +6,14 @@ import (
 	"database/sql"
 )
 
-func SetupRoutes(db *sql.DB) {
+func SetupRoutes(taskhandler *handlers.TaskHandler,db *sql.DB) {
 	http.HandleFunc("POST /users/{userId}/tasks", handlers.InsertTask(db))
 	http.HandleFunc("POST /user",handlers.InsertUser(db))
 
 	http.HandleFunc("GET /users",handlers.GetAllUsers(db))
 	http.HandleFunc("GET /users/{userid}",handlers.GetUserById(db))
-	http.HandleFunc("GET /users/{userid}/tasks",handlers.GetTaskByUserId(db))
+	// http.HandleFunc("GET /users/{userid}/tasks",handlers.GetTaskByUserId(db))
+	http.HandleFunc("GET /users/{userid}/tasks",taskhandler.GetTaskByUserId)
 
 	http.HandleFunc("PATCH /users/{userid}/tasks/{taskid}",handlers.UpdateTask(db))
 

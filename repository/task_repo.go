@@ -3,6 +3,7 @@ package repository
 import(
 	"database/sql"
 	"go-sqlite/models"
+	"log"
 )
 
 
@@ -10,18 +11,18 @@ type TaskRepository struct{
 	db *sql.DB
 }
 
-func TaskRepository (db *sql.DB) *TaskRepository{
+func NewTaskRepository (db *sql.DB) *TaskRepository{
 	return &TaskRepository{db:db}
 }
 
-func (r *TaskRepository) GetTaskByUserId(query string,params []interface{})([]models.Task,err){
+func (r *TaskRepository) GetTaskByUserId(query string,params []interface{})([]models.Task,error){
 
 
 	var tasklist []models.Task
 	rows,err := r.db.Query(query,params...)
 	if err!=nil{
 		log.Println("error in execution the query",err)
-		return 
+		return nil,err
 	}
 	for rows.Next(){
 		var task models.Task
@@ -32,11 +33,12 @@ func (r *TaskRepository) GetTaskByUserId(query string,params []interface{})([]mo
 			&task.Status,
 			&task.UserId,
 			&task.CreatedAt,
-			&task.UpdatedAt
+			&task.UpdatedAt,
 
 		)
 		if err!=nil{
 			log.Println("error in scanning the  data",err)
+			return nil,err
 		}
 		tasklist = append(tasklist,task)
 	}

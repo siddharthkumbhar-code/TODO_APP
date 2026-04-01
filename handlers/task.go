@@ -21,7 +21,6 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 		status := request.URL.Query().Get("status")
 		sortby := request.URL.Query().Get("sortby")
 		order := request.URL.Query().Get("order")
-
 		cursor:= request.URL.Query().Get("cursor")
 		limitstr := request.URL.Query().Get("limit")
 		pagenostr := request.URL.Query().Get("pageno")

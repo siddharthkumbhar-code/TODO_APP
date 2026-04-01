@@ -7,8 +7,9 @@ import (
 	"log"
 	"os"
 	"go-sqlite/database"
-
-	
+	"go-sqlite/handlers"
+	"go-sqlite/services"
+	"go-sqlite/repository"	
 )
 
 
@@ -26,8 +27,11 @@ func main(){
 	dbconn := db.Dbinit()
 
 	defer dbconn.Close()
-
-	 routes.SetupRoutes(dbconn)
+     
+	repo := repository.NewTaskRepository(dbconn)
+	service := services.NewTaskServices(repo)
+	handler := handlers.NewTaskHandler(service)
+	 routes.SetupRoutes(handler,dbconn)
 
 	log.Println("server running on port 8080")
 	http.ListenAndServe(":8080", nil)

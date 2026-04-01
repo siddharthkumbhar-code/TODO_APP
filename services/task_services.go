@@ -1,0 +1,92 @@
+package services
+
+import(
+  "go-sqlite/models"
+  "log"
+  "strconv"
+  "go-sqlite/repository"
+)
+
+var validfields = map[string]bool{
+			"name":true,
+			"createdAt":true,
+			"updatedAt":true,
+		}
+
+type TaskServices struct{
+   repo *repository.TaskRepository
+}
+
+func NewTaskServices(repo *repository.TaskRepository) *TaskServices{
+    return &TaskServices{repo:repo}
+}
+
+func (s *TaskServices) GetTaskByUserId(useridstr string,status string,sortby string,order string,cursor string ,limitstr string,pagenostr string)([]models.Task,error){
+
+     var err error
+        limit:=5
+		pageno:=1
+		if limitstr!=""{
+			parsedlimit, err := strconv.Atoi(limitstr);
+			if err!=nil{
+				log.Println("plz provide valid limit",err)
+				return nil,err
+			}
+			limit=parsedlimit
+		}
+		if pagenostr!=""{
+			parsedpage, err := strconv.Atoi(pagenostr);
+			if err!=nil{
+				log.Println("plz provide valid pageno",err)
+				return nil,err
+			}
+			pageno=parsedpage
+		}
+
+		if useridstr == "" {
+			log.Println("id required plz!")
+			return nil,err
+		}
+
+		userid, err := strconv.Atoi(useridstr)
+		if err != nil {
+			log.Println("id must be the number")
+			return nil,err
+		}
+		query := `SELECT * FROM tasks1 WHERE userid=?`
+		parameters := []interface{}{userid}
+
+		if status!=""{
+			query=query+" AND status=? "
+			parameters = append(parameters,status)
+		}
+		
+		if cursor != "" {
+			query += " AND createdAt > ?"
+			parameters = append(parameters, cursor)
+		}
+
+		if validfields[sortby]{
+			query = query + " ORDER BY " + sortby
+			
+			if order=="ASC" || order=="asc"{
+				query+=" ASC "
+			}else{
+				query+="DESC"
+			}
+		}else{
+			query+= " ORDER BY createdAt DESC"
+		}
+		//pagination
+        if cursor!=""{
+			query+=" LIMIT ? "
+			parameters = append(parameters,limit)
+		}else{
+			offset := (pageno-1)*limit
+			query+=" LIMIT ? OFFSET ?"
+			parameters =append(parameters,limit,offset)
+		}
+		log.Println("Query:", query)
+        log.Println("Values:", parameters)
+		return s.repo.GetTaskByUserId(query,parameters)
+}
