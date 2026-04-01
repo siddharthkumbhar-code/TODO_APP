@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+
+
 func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
@@ -115,8 +117,6 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		
-         
 		json.NewEncoder(writer).Encode(map[string]interface{}{
 			"message":  "the task of the user are",
 			"tasklist": tasklist,
