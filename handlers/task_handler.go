@@ -1,101 +1,102 @@
-package handlers 
+package handlers
 
-import(
+import (
+	"encoding/json"
+	"go-sqlite/models"
+	"go-sqlite/services"
 	"log"
 	"net/http"
-	"go-sqlite/services"
-	"go-sqlite/models"
-	"encoding/json"
 	"strconv"
 )
 
-type TaskHandler struct{
+type TaskHandler struct {
 	service *services.TaskServices
 }
 
-func NewTaskHandler(service *services.TaskServices) *TaskHandler{
-	return &TaskHandler{service:service}
+func NewTaskHandler(service *services.TaskServices) *TaskHandler {
+	return &TaskHandler{service: service}
 }
 
-func(h *TaskHandler)GetTaskByUserId(writer http.ResponseWriter,request *http.Request){
+func (h *TaskHandler) GetTaskByUserId(writer http.ResponseWriter, request *http.Request) {
 
-	    useridstr := request.PathValue("userid")
-		status := request.URL.Query().Get("status")
-		sortby := request.URL.Query().Get("sortby")
-		order := request.URL.Query().Get("order")
-		cursor:= request.URL.Query().Get("cursor")
-		limitstr := request.URL.Query().Get("limit")
-		pagenostr := request.URL.Query().Get("pageno")
+	useridstr := request.PathValue("userid")
+	status := request.URL.Query().Get("status")
+	sortby := request.URL.Query().Get("sortby")
+	order := request.URL.Query().Get("order")
+	cursor := request.URL.Query().Get("cursor")
+	limitstr := request.URL.Query().Get("limit")
+	pagenostr := request.URL.Query().Get("pageno")
 
-		tasks,err := h.service.GetTaskByUserId(useridstr,status,sortby,order,cursor,limitstr,pagenostr)
-		if err!=nil{
-			log.Println("error in service function call",err)
-		}
-		json.NewEncoder(writer).Encode(map[string]interface{}{
-			"message":"the tasks of the users are as follows",
-			"tasks":tasks,
-		})
+	tasks, err := h.service.GetTaskByUserId(useridstr, status, sortby, order, cursor, limitstr, pagenostr)
+	if err != nil {
+		log.Println("error in service function call", err)
+	}
+
+	json.NewEncoder(writer).Encode(map[string]interface{}{
+		"message": "the tasks of the users are as follows",
+		"tasks":   tasks,
+	})
 }
 
-func (h *TaskHandler) InsertTask(writer http.ResponseWriter, request *http.Request){
-	
-	   if request.Method!=http.MethodPost{
-			http.Error(writer,"Invalid Method type",405)
-			log.Println("Invalid Method type")
-			return 
-		}
-		var newtask models.Task
-		userIDStr := request.PathValue("userid")
-        
-		userID, err := strconv.Atoi(userIDStr)
-		
-		if err != nil {
-			log.Println("User id must be positive")
-			http.Error(writer, "invalid userId", http.StatusBadRequest)
-			return 
-		}
-		if userID<=0{
-			log.Println("User id must be positive")
-			http.Error(writer,"userid must be positive",400)
-			return
-		}
+func (h *TaskHandler) InsertTask(writer http.ResponseWriter, request *http.Request) {
 
-		err = json.NewDecoder(request.Body).Decode(&newtask)
+	if request.Method != http.MethodPost {
+		http.Error(writer, "Invalid Method type", 405)
+		log.Println("Invalid Method type")
+		return
+	}
+	var newtask models.Task
+	userIDStr := request.PathValue("userid")
 
-		if err != nil {
-			http.Error(writer,"Invalid body or empty body",400)
-			log.Println("error in fetching the data")
-			return
-		}
-			newtask.UserId = userID
-		 
-		 err = h.service.InsertTask(newtask)
-		 if err!=nil{
-			log.Println("error in service function calling ")
-			return 
-		 }
-		json.NewEncoder(writer).Encode(map[string]interface{}{
-			"message":  "the task inserted succesfully into database ",
-			"taskname": newtask.Name,
-			"userid":   userID,
-		})
+	userID, err := strconv.Atoi(userIDStr)
+
+	if err != nil {
+		log.Println("User id must be positive")
+		http.Error(writer, "invalid userId", http.StatusBadRequest)
+		return
+	}
+	if userID <= 0 {
+		log.Println("User id must be positive")
+		http.Error(writer, "userid must be positive", 400)
+		return
+	}
+
+	err = json.NewDecoder(request.Body).Decode(&newtask)
+
+	if err != nil {
+		http.Error(writer, "Invalid body or empty body", 400)
+		log.Println("error in fetching the data")
+		return
+	}
+	newtask.UserId = userID
+
+	err = h.service.InsertTask(newtask)
+	if err != nil {
+		log.Println("error in service function calling ")
+		return
+	}
+	json.NewEncoder(writer).Encode(map[string]interface{}{
+		"message":  "the task inserted succesfully into database ",
+		"taskname": newtask.Name,
+		"userid":   userID,
+	})
 }
 
-func(h *TaskHandler) DeleteTask(writer http.ResponseWriter,request *http.Request){
+func (h *TaskHandler) DeleteTask(writer http.ResponseWriter, request *http.Request) {
 	idstr := request.PathValue("taskid")
 	useridstr := request.PathValue("userid")
 
-	err := h.service.DeleteTask(idstr,useridstr)
-	if err!=nil{
+	err := h.service.DeleteTask(idstr, useridstr)
+	if err != nil {
 		log.Println("error in passing the data to the services")
 		return
 	}
 
 	json.NewEncoder(writer).Encode(map[string]interface{}{
-			"message":        "task deleted succesfully",
-			"deleted userid": useridstr,
-			"deleted task":   idstr,
-		})
+		"message":        "task deleted succesfully",
+		"deleted userid": useridstr,
+		"deleted task":   idstr,
+	})
 }
 
 func (h *TaskHandler) UpdateTask(writer http.ResponseWriter, request *http.Request) {

@@ -8,18 +8,18 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	
 )
- func UpdateTask(db *sql.DB) http.HandlerFunc {
+
+func UpdateTask(db *sql.DB) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
-		if request.Method!=http.MethodPatch{
-			http.Error(writer,"Invalid method",405)
+		if request.Method != http.MethodPatch {
+			http.Error(writer, "Invalid method", 405)
 			log.Println("Invalid method type")
 			return
 		}
 		userid := request.PathValue("userid")
-		 taskid := request.PathValue("taskid")
+		taskid := request.PathValue("taskid")
 
 		if userid == "" || taskid == "" {
 			http.Error(writer, "Enter a valid task and user id", 400)
@@ -60,13 +60,13 @@ import (
 			return
 		}
 
-		name:=strings.TrimSpace(reqbody.Name)
+		name := strings.TrimSpace(reqbody.Name)
 		var query string
-		if reqbody.Name!="" &&name==""{
-			http.Error(writer,"Name should not be empty",400)
-			return 
+		if reqbody.Name != "" && name == "" {
+			http.Error(writer, "Name should not be empty", 400)
+			return
 		}
-		
+
 		var res sql.Result
 		switch {
 		case reqbody.Name != "" && reqbody.Status != "":
