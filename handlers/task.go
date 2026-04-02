@@ -122,129 +122,129 @@ func GetTaskByUserId(db *sql.DB) http.HandlerFunc {
 			
 		})
 	}
-}
+}//done
 
-func InsertTask(db *sql.DB) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
+// func InsertTask(db *sql.DB) http.HandlerFunc {
+// 	return func(writer http.ResponseWriter, request *http.Request) {
 
-		if request.Method!=http.MethodPost{
-			http.Error(writer,"Invalid Method type",405)
-			log.Println("Invalid Method type")
-			return
-		}
-		var newtask models.Task
-		userIDStr := request.PathValue("userid")
+// 		if request.Method!=http.MethodPost{
+// 			http.Error(writer,"Invalid Method type",405)
+// 			log.Println("Invalid Method type")
+// 			return
+// 		}
+// 		var newtask models.Task
+// 		userIDStr := request.PathValue("userid")
 
-		userID, err := strconv.Atoi(userIDStr)
-		if err != nil {
-			log.Println("User id must be positive")
-			http.Error(writer, "invalid userId", http.StatusBadRequest)
-			return
-		}
-		if userID<=0{
-			log.Println("User id must be positive")
-			http.Error(writer,"userid must be positive",400)
-			return
-		}
+// 		userID, err := strconv.Atoi(userIDStr)
+// 		if err != nil {
+// 			log.Println("User id must be positive")
+// 			http.Error(writer, "invalid userId", http.StatusBadRequest)
+// 			return
+// 		}
+// 		if userID<=0{
+// 			log.Println("User id must be positive")
+// 			http.Error(writer,"userid must be positive",400)
+// 			return
+// 		}
 
-		err = json.NewDecoder(request.Body).Decode(&newtask)
+// 		err = json.NewDecoder(request.Body).Decode(&newtask)
 
-		if err != nil {
-			http.Error(writer,"Invalid body or empty body",400)
-			log.Println("error in fetching the data")
-			return
-		}
-		// newtask.Name=strings.TrimSpace(newtask.Name)
-		// if newtask.Name==""{
-		// 	http.Error(writer,"Task name should not be empty",400)
-		// 	log.Println("Enter a task")
-		// 	return
-		// }
-		// validstatus:=map[string]bool{
-		// 	"pending":true,
-		// 	"done":true,
-		// }
-		// newtask.Status=strings.ToLower(strings.TrimSpace(newtask.Status))
-		// if newtask.Status == "" {
-		// 		newtask.Status = "pending"
-		// } else if !validstatus[newtask.Status] {
-		// 	http.Error(writer,"Invalid status(done/pending only allowed)",400)
-		// 	log.Println("Invalid status(done/pending only allowed)")
-		// 	return
-		// }
+// 		if err != nil {
+// 			http.Error(writer,"Invalid body or empty body",400)
+// 			log.Println("error in fetching the data")
+// 			return
+// 		}
+// 		// newtask.Name=strings.TrimSpace(newtask.Name)
+// 		// if newtask.Name==""{
+// 		// 	http.Error(writer,"Task name should not be empty",400)
+// 		// 	log.Println("Enter a task")
+// 		// 	return
+// 		// }
+// 		// validstatus:=map[string]bool{
+// 		// 	"pending":true,
+// 		// 	"done":true,
+// 		// }
+// 		// newtask.Status=strings.ToLower(strings.TrimSpace(newtask.Status))
+// 		// if newtask.Status == "" {
+// 		// 		newtask.Status = "pending"
+// 		// } else if !validstatus[newtask.Status] {
+// 		// 	http.Error(writer,"Invalid status(done/pending only allowed)",400)
+// 		// 	log.Println("Invalid status(done/pending only allowed)")
+// 		// 	return
+// 		// }
 
-		// query := `INSERT INTO tasks1 (name ,status,userid,createdAt,updatedAt) VALUES(?,?,?,?,?)`
+// 		// query := `INSERT INTO tasks1 (name ,status,userid,createdAt,updatedAt) VALUES(?,?,?,?,?)`
 		
-		// now := time.Now().UTC().Format(time.RFC3339)
-		// _, err = db.Exec(query, newtask.Name, newtask.Status, userID, now, now)
+// 		// now := time.Now().UTC().Format(time.RFC3339)
+// 		// _, err = db.Exec(query, newtask.Name, newtask.Status, userID, now, now)
 
-		// if err != nil {
-		// 	log.Println("somthing went wrong to inserting the data ", err)
-		// 	http.Error(writer,"Error while creating the task",500)
-		// 	return
-		// }
-		writer.Header().Set("Content-type", "application/json")
-		json.NewEncoder(writer).Encode(map[string]interface{}{
-			"message":  "the task inserted succesfully into database ",
-			"taskname": newtask.Name,
-			"userid":   userID,
-		})
-	}
-}
+// 		// if err != nil {
+// 		// 	log.Println("somthing went wrong to inserting the data ", err)
+// 		// 	http.Error(writer,"Error while creating the task",500)
+// 		// 	return
+// 		// }
+// 		writer.Header().Set("Content-type", "application/json")
+// 		json.NewEncoder(writer).Encode(map[string]interface{}{
+// 			"message":  "the task inserted succesfully into database ",
+// 			"taskname": newtask.Name,
+// 			"userid":   userID,
+// 		})
+// 	}
+// }//done
 
 
-func DeleteTask(db *sql.DB) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		idstr := request.PathValue("taskid")
-		useridstr := request.PathValue("userid")
+// func DeleteTask(db *sql.DB) http.HandlerFunc {
+// 	return func(writer http.ResponseWriter, request *http.Request) {
+// 		idstr := request.PathValue("taskid")
+// 		useridstr := request.PathValue("userid")
 
-		if idstr == "" || useridstr == "" {
-			log.Println("userid and taskid  required plz provide ids")
-			return
-		}
+// 		if idstr == "" || useridstr == "" {
+// 			log.Println("userid and taskid  required plz provide ids")
+// 			return
+// 		}
 
-		id, err := strconv.Atoi(idstr)
-		if err != nil {
-			log.Println("id must be integer", err)
-			return
-		}
+// 		id, err := strconv.Atoi(idstr)
+// 		if err != nil {
+// 			log.Println("id must be integer", err)
+// 			return
+// 		}
 
-		userid, err1 := strconv.Atoi(useridstr)
-		if err1 != nil {
-			log.Println("userid must be integer", err1)
-			return
-		}
+// 		userid, err1 := strconv.Atoi(useridstr)
+// 		if err1 != nil {
+// 			log.Println("userid must be integer", err1)
+// 			return
+// 		}
 
-		query := `DELETE FROM tasks1 WHERE userid=? AND id=?`
+// 		query := `DELETE FROM tasks1 WHERE userid=? AND id=?`
 
-		result, err := db.Exec(query, userid, id)
+// 		result, err := db.Exec(query, userid, id)
 
-		if err != nil {
-			log.Println("error while executing the database query", err)
-			return
-		}
+// 		if err != nil {
+// 			log.Println("error while executing the database query", err)
+// 			return
+// 		}
 
-		rowsAffected, err := result.RowsAffected()
+// 		rowsAffected, err := result.RowsAffected()
 
-		if err != nil {
-			log.Println("error in checking rows affected", err)
-			return
-		}
+// 		if err != nil {
+// 			log.Println("error in checking rows affected", err)
+// 			return
+// 		}
 
-		if rowsAffected == 0 {
-			json.NewEncoder(writer).Encode(map[string]interface{}{
-				"error": "task not found",
-			})
-			return
-		}
+// 		if rowsAffected == 0 {
+// 			json.NewEncoder(writer).Encode(map[string]interface{}{
+// 				"error": "task not found",
+// 			})
+// 			return
+// 		}
 
-		json.NewEncoder(writer).Encode(map[string]interface{}{
-			"message":        "task deleted succesfully",
-			"deleted userid": userid,
-			"deleted task":   id,
-		})
-	}
-}
+// 		json.NewEncoder(writer).Encode(map[string]interface{}{
+// 			"message":        "task deleted succesfully",
+// 			"deleted userid": userid,
+// 			"deleted task":   id,
+// 		})
+// 	}
+// }
 
 func UpdateTask(db *sql.DB) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {

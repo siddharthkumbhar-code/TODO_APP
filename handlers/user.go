@@ -72,7 +72,7 @@ func InsertUser(db *sql.DB) http.HandlerFunc {
 			"message":  "This user added succesfully",
 		})
 	}
-}
+}//done
 
 func GetAllUsers(db *sql.DB) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {

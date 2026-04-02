@@ -99,6 +99,7 @@ func (s *TaskServices) GetTaskByUserId(useridstr string,status string,sortby str
 
 func (s *TaskServices) InsertTask(newtask models.Task)error{
 	
+	log.Println(newtask.UserId)
 	newtask.Name=strings.TrimSpace(newtask.Name)
 		if newtask.Name==""{
 		
@@ -116,3 +117,30 @@ func (s *TaskServices) InsertTask(newtask models.Task)error{
 		}
 		return s.repo.InsertTask(newtask)
 } 
+
+func (s *TaskServices) DeleteTask(idstr string , useridstr string) error{
+    if idstr == "" || useridstr == "" {
+			log.Println("userid and taskid  required plz provide ids")
+			return nil
+		}
+
+		id, err := strconv.Atoi(idstr)
+		if err != nil {
+			log.Println("id must be integer", err)
+			return err
+		}
+
+		userid, err1 := strconv.Atoi(useridstr)
+		if err1 != nil {
+			log.Println("userid must be integer", err1)
+			return err1
+		}
+	
+		_,err = s.repo.DeleteTask(id,userid);
+		if err != nil {
+			log.Println("error while executing the database query", err)
+			return err
+		}
+	return nil
+		
+}

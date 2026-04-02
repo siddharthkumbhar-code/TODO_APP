@@ -53,12 +53,35 @@ func(r *TaskRepository) InsertTask(newtask models.Task) error{
 	    query := `INSERT INTO tasks1 (name ,status,userid,createdAt,updatedAt) VALUES(?,?,?,?,?)`
 	
 		now := time.Now().UTC().Format(time.RFC3339)
+        log.Println( query,newtask.Name, newtask.Status, newtask.UserId, now, now)
 		_, err := r.db.Exec(query, newtask.Name, newtask.Status, newtask.UserId, now, now)
-
+        
 		if err != nil {
 			log.Println("somthing went wrong to inserting the data ", err)
 			//http.Error(writer,"Error while creating the task",500)
 			return err
 		}
    return nil
+}
+
+func (r *TaskRepository) DeleteTask(id int , userid int)( int64,error){
+	query := `DELETE FROM tasks1 WHERE userid=? AND id=?`
+
+	result,err := r.db.Exec(query, userid,id)
+	if err != nil {
+			log.Println("error while executing the database query", err)
+			return 0,err
+		}
+    rowsAffected, err := result.RowsAffected()
+
+		if err != nil {
+			log.Println("error in checking rows affected", err)
+			return 0,err
+		}
+
+		if rowsAffected == 0 {
+			 log.Println("task not found ")
+			 return 0,nil  
+		}
+	return 	rowsAffected,nil
 }

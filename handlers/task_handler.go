@@ -46,8 +46,9 @@ func (h *TaskHandler) InsertTask(writer http.ResponseWriter, request *http.Reque
 		}
 		var newtask models.Task
 		userIDStr := request.PathValue("userid")
-
+        
 		userID, err := strconv.Atoi(userIDStr)
+		
 		if err != nil {
 			log.Println("User id must be positive")
 			http.Error(writer, "invalid userId", http.StatusBadRequest)
@@ -66,6 +67,7 @@ func (h *TaskHandler) InsertTask(writer http.ResponseWriter, request *http.Reque
 			log.Println("error in fetching the data")
 			return
 		}
+			newtask.UserId = userID
 		 
 		 err = h.service.InsertTask(newtask)
 		 if err!=nil{
@@ -76,5 +78,22 @@ func (h *TaskHandler) InsertTask(writer http.ResponseWriter, request *http.Reque
 			"message":  "the task inserted succesfully into database ",
 			"taskname": newtask.Name,
 			"userid":   userID,
+		})
+}
+
+func(h *TaskHandler) DeleteTask(writer http.ResponseWriter,request *http.Request){
+	idstr := request.PathValue("taskid")
+	useridstr := request.PathValue("userid")
+
+	err := h.service.DeleteTask(idstr,useridstr)
+	if err!=nil{
+		log.Println("error in passing the data to the services")
+		return
+	}
+
+	json.NewEncoder(writer).Encode(map[string]interface{}{
+			"message":        "task deleted succesfully",
+			"deleted userid": useridstr,
+			"deleted task":   idstr,
 		})
 }
