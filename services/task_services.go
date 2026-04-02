@@ -5,12 +5,18 @@ import(
   "log"
   "strconv"
   "go-sqlite/repository"
+  "strings"
 )
 
 var validfields = map[string]bool{
 			"name":true,
 			"createdAt":true,
 			"updatedAt":true,
+		}
+
+  var validstatus = map[string]bool{
+			"pending":true,
+			"done":true,
 		}
 
 type TaskServices struct{
@@ -90,3 +96,23 @@ func (s *TaskServices) GetTaskByUserId(useridstr string,status string,sortby str
         log.Println("Values:", parameters)
 		return s.repo.GetTaskByUserId(query,parameters)
 }
+
+func (s *TaskServices) InsertTask(newtask models.Task)error{
+	
+	newtask.Name=strings.TrimSpace(newtask.Name)
+		if newtask.Name==""{
+		
+			log.Println("Enter a task")
+			return nil
+		}
+
+		newtask.Status=strings.ToLower(strings.TrimSpace(newtask.Status))
+		if newtask.Status == "" {
+				newtask.Status = "pending"
+		} else if !validstatus[newtask.Status] {
+			
+			log.Println("Invalid status(done/pending only allowed)")
+			return nil 
+		}
+		return s.repo.InsertTask(newtask)
+} 

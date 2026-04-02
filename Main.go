@@ -30,8 +30,14 @@ func main(){
      
 	repo := repository.NewTaskRepository(dbconn)
 	service := services.NewTaskServices(repo)
-	handler := handlers.NewTaskHandler(service)
-	 routes.SetupRoutes(handler,dbconn)
+	taskhandler := handlers.NewTaskHandler(service)
+	
+
+	repouser := repository.NewUserRepository(dbconn)
+	userservices := services.NewUserServices(repouser)
+	userhandler := handlers.NewUserHandler(userservices)
+
+	routes.SetupRoutes(taskhandler,userhandler,dbconn)
 
 	log.Println("server running on port 8080")
 	http.ListenAndServe(":8080", nil)

@@ -4,6 +4,8 @@ import(
 	"database/sql"
 	"go-sqlite/models"
 	"log"
+	"time"
+	
 )
 
 
@@ -43,4 +45,20 @@ func (r *TaskRepository) GetTaskByUserId(query string,params []interface{})([]mo
 		tasklist = append(tasklist,task)
 	}
 	return tasklist,nil
+}
+
+
+func(r *TaskRepository) InsertTask(newtask models.Task) error{
+	
+	    query := `INSERT INTO tasks1 (name ,status,userid,createdAt,updatedAt) VALUES(?,?,?,?,?)`
+	
+		now := time.Now().UTC().Format(time.RFC3339)
+		_, err := r.db.Exec(query, newtask.Name, newtask.Status, newtask.UserId, now, now)
+
+		if err != nil {
+			log.Println("somthing went wrong to inserting the data ", err)
+			//http.Error(writer,"Error while creating the task",500)
+			return err
+		}
+   return nil
 }

@@ -4,7 +4,9 @@ import(
 	"log"
 	"net/http"
 	"go-sqlite/services"
+	"go-sqlite/models"
 	"encoding/json"
+	"strconv"
 )
 
 type TaskHandler struct{
@@ -32,5 +34,47 @@ func(h *TaskHandler)GetTaskByUserId(writer http.ResponseWriter,request *http.Req
 		json.NewEncoder(writer).Encode(map[string]interface{}{
 			"message":"the tasks of the users are as follows",
 			"tasks":tasks,
+		})
+}
+
+func (h *TaskHandler) InsertTask(writer http.ResponseWriter, request *http.Request){
+	
+	   if request.Method!=http.MethodPost{
+			http.Error(writer,"Invalid Method type",405)
+			log.Println("Invalid Method type")
+			return 
+		}
+		var newtask models.Task
+		userIDStr := request.PathValue("userid")
+
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			log.Println("User id must be positive")
+			http.Error(writer, "invalid userId", http.StatusBadRequest)
+			return 
+		}
+		if userID<=0{
+			log.Println("User id must be positive")
+			http.Error(writer,"userid must be positive",400)
+			return
+		}
+
+		err = json.NewDecoder(request.Body).Decode(&newtask)
+
+		if err != nil {
+			http.Error(writer,"Invalid body or empty body",400)
+			log.Println("error in fetching the data")
+			return
+		}
+		 
+		 err = h.service.InsertTask(newtask)
+		 if err!=nil{
+			log.Println("error in service function calling ")
+			return 
+		 }
+		json.NewEncoder(writer).Encode(map[string]interface{}{
+			"message":  "the task inserted succesfully into database ",
+			"taskname": newtask.Name,
+			"userid":   userID,
 		})
 }

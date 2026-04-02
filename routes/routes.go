@@ -6,12 +6,17 @@ import (
 	"database/sql"
 )
 
-func SetupRoutes(taskhandler *handlers.TaskHandler,db *sql.DB) {
-	http.HandleFunc("POST /users/{userId}/tasks", handlers.InsertTask(db))
-	http.HandleFunc("POST /user",handlers.InsertUser(db))
+func SetupRoutes(taskhandler *handlers.TaskHandler,userhandler *handlers.UserHandler,db *sql.DB) {
+	//http.HandleFunc("POST /users/{userId}/tasks", handlers.InsertTask(db))
+	http.HandleFunc("POST /users/{userId}/tasks", taskhandler.InsertTask)
+
+	//http.HandleFunc("POST /user",handlers.InsertUser(db))
+    http.HandleFunc("POST /user",userhandler.InsertUser)
+
 
 	http.HandleFunc("GET /users",handlers.GetAllUsers(db))
 	http.HandleFunc("GET /users/{userid}",handlers.GetUserById(db))
+
 	// http.HandleFunc("GET /users/{userid}/tasks",handlers.GetTaskByUserId(db))
 	http.HandleFunc("GET /users/{userid}/tasks",taskhandler.GetTaskByUserId)
 
