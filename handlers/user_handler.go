@@ -43,3 +43,20 @@ func (handler *UserHandler) InsertUser(writer http.ResponseWriter, request *http
 			
 		})
 }
+
+func (handler *UserHandler) GetUserById(writer http.ResponseWriter, request *http.Request){
+
+		idstr := request.PathValue("userid")
+
+		user ,err := handler. service.GetUserById(idstr)
+		 if err!=nil{
+			log.Println("error in fetching data in handler function",err)
+			
+		 }
+		json.NewEncoder(writer).Encode(map[string]interface{}{
+			"message":   "the user is ",
+			"username":  user.Username,
+			"userid":    user.Userid,
+			"useremail": user.Email,
+		})
+}

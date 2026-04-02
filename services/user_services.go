@@ -6,6 +6,7 @@ import(
   "go-sqlite/repository"
   "strings"
   "net/mail"
+  "strconv"
 )
 
 type UserServices struct{
@@ -15,6 +16,7 @@ type UserServices struct{
 func NewUserServices(repo *repository.UserRepository) *UserServices{
 	return &UserServices{repo:repo}
 }
+
 func (userserv *UserServices) InsertUser(newuser models.Users)error{
     	if newuser.Username == "" && newuser.Email == "" {
 			
@@ -54,3 +56,33 @@ func (userserv *UserServices) InsertUser(newuser models.Users)error{
 		}
 		return userserv.repo.InsertUser(newuser)
 }
+
+func (userserv *UserServices) GetUserById(idstr string) (models.Users,error){
+     
+       var user models.Users
+
+		if idstr == "" {
+			log.Println("Id required")
+			return user,nil
+		}
+
+		id, err := strconv.Atoi(idstr)
+		if err != nil {
+			log.Println("id must be number")
+			//http.Error(writer,"Id must be Number",400)
+			return user,err
+		}
+		if id <=0 {
+
+			log.Println(" Enter a positive number for the UserId")
+			return user,nil
+		}
+
+		user,err = userserv.repo.GetUserById(id)
+		if err!=nil{
+			log.Println("error in fetching the user in service function" ,err)
+			return user,err
+		}
+		return user,nil
+}
+

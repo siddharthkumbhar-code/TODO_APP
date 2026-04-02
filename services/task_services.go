@@ -3,6 +3,7 @@ package services
 import(
   "go-sqlite/models"
   "log"
+  "fmt"
   "strconv"
   "go-sqlite/repository"
   "strings"
@@ -14,7 +15,7 @@ var validfields = map[string]bool{
 			"updatedAt":true,
 		}
 
-  var validstatus = map[string]bool{
+var validstatus = map[string]bool{
 			"pending":true,
 			"done":true,
 		}
@@ -143,4 +144,40 @@ func (s *TaskServices) DeleteTask(idstr string , useridstr string) error{
 		}
 	return nil
 		
+}
+
+func (s *TaskServices) UpdateTask(useridStr, taskidStr, name, status string) error {
+
+	if useridStr == "" || taskidStr == "" {
+		return fmt.Errorf("userid and taskid required")
+	}
+
+	uid, err := strconv.Atoi(useridStr)
+	if err != nil || uid <= 0 {
+		return fmt.Errorf("invalid userid")
+	}
+
+	tid, err := strconv.Atoi(taskidStr)
+	if err != nil || tid <= 0 {
+		return fmt.Errorf("invalid taskid")
+	}
+
+	if strings.TrimSpace(name) == "" && name != "" {
+		return fmt.Errorf("name should not be empty")
+	}
+
+	if name == "" && status == "" {
+		return fmt.Errorf("nothing to update")
+	}
+
+	rows, err := s.repo.UpdateTask(uid, tid, name, status)
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("task not found")
+	}
+
+	return nil
 }

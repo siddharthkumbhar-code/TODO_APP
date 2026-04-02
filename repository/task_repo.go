@@ -85,3 +85,42 @@ func (r *TaskRepository) DeleteTask(id int , userid int)( int64,error){
 		}
 	return 	rowsAffected,nil
 }
+
+func (r *TaskRepository) UpdateTask(userid, taskid int, name, status string) (int64, error) {
+
+	var query string
+	var res sql.Result
+	var err error
+
+	switch {
+	case name != "" && status != "":
+		query = `UPDATE tasks1 
+			SET name=?, status=?, updatedAt=CURRENT_TIMESTAMP
+			WHERE id=? AND userid=?`
+		res, err = r.db.Exec(query, name, status, taskid, userid)
+
+	case name != "":
+		query = `UPDATE tasks1 
+			SET name=?, updatedAt=CURRENT_TIMESTAMP
+			WHERE id=? AND userid=?`
+		res, err = r.db.Exec(query, name, taskid, userid)
+
+	case status != "":
+		query = `UPDATE tasks1 
+			SET status=?, updatedAt=CURRENT_TIMESTAMP
+			WHERE id=? AND userid=?`
+		res, err = r.db.Exec(query, status, taskid, userid)
+	}
+
+	if err != nil {
+		log.Println("error updating task:", err)
+		return 0, err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return rows, nil
+}

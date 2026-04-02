@@ -97,3 +97,35 @@ func(h *TaskHandler) DeleteTask(writer http.ResponseWriter,request *http.Request
 			"deleted task":   idstr,
 		})
 }
+
+func (h *TaskHandler) UpdateTask(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodPatch {
+		http.Error(writer, "Invalid method", 405)
+		return
+	}
+
+	userid := request.PathValue("userid")
+	taskid := request.PathValue("taskid")
+
+	var reqbody struct {
+		Name   string `json:"name"`
+		Status string `json:"status"`
+	}
+
+	err := json.NewDecoder(request.Body).Decode(&reqbody)
+	if err != nil {
+		http.Error(writer, "Invalid body", 400)
+		return
+	}
+
+	err = h.service.UpdateTask(userid, taskid, reqbody.Name, reqbody.Status)
+	if err != nil {
+		http.Error(writer, err.Error(), 400)
+		return
+	}
+
+	json.NewEncoder(writer).Encode(map[string]interface{}{
+		"message": "task updated successfully",
+	})
+}
