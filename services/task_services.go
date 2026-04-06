@@ -52,7 +52,7 @@ func (s *TaskServices) GetTaskByUserId(useridstr string, status string, sortby s
 
 	if useridstr == "" {
 		log.Println("id required plz!")
-		return nil, err
+		return nil, fmt.Errorf("id required plz")
 	}
 
 	userid, err := strconv.Atoi(useridstr)
