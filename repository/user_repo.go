@@ -29,7 +29,6 @@ func (repo *UserRepository) InsertUser(newuser models.Users) error {
 		log.Println("error while inserting the user ", err)
 		return err
 	}
-
 	return nil
 }
 
