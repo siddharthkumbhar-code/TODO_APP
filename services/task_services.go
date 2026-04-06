@@ -52,7 +52,7 @@ func (s *TaskServices) GetTaskByUserId(useridstr string, status string, sortby s
 
 	if useridstr == "" {
 		log.Println("id required plz!")
-		return nil, err
+		return nil, fmt.Errorf("id required plz")
 	}
 
 	userid, err := strconv.Atoi(useridstr)
@@ -107,7 +107,7 @@ func (s *TaskServices) InsertTask(newtask models.Task) error {
 	if newtask.Name == "" {
 
 		log.Println("Enter a task")
-		return nil
+		return fmt.Errorf("enter task name!")
 	}
 
 	newtask.Status = strings.ToLower(strings.TrimSpace(newtask.Status))
@@ -116,7 +116,7 @@ func (s *TaskServices) InsertTask(newtask models.Task) error {
 	} else if !validstatus[newtask.Status] {
 
 		log.Println("Invalid status(done/pending only allowed)")
-		return nil
+		return fmt.Errorf("invalid status ")
 	}
 	return s.repo.InsertTask(newtask)
 }
@@ -124,7 +124,7 @@ func (s *TaskServices) InsertTask(newtask models.Task) error {
 func (s *TaskServices) DeleteTask(idstr string, useridstr string) error {
 	if idstr == "" || useridstr == "" {
 		log.Println("userid and taskid  required plz provide ids")
-		return nil
+		return fmt.Errorf("userid and taskid requried")
 	}
 
 	id, err := strconv.Atoi(idstr)
