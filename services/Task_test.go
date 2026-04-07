@@ -12,7 +12,6 @@ func Getservice() *TaskServices {
 	repo := repository.NewTaskRepository(db)
 	service := NewTaskServices(repo)
 	return service
-
 }
 
 // gettaskuserbyid function
