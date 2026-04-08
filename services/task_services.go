@@ -24,6 +24,13 @@ type TaskServices struct {
 	repo repository.TaskRepo
 }
 
+type TaskService interface {
+	InsertTask(task models.Task) error
+	DeleteTask(idstr string, useridstr string) error
+	UpdateTask(useridStr, taskidStr, name, status string) error
+	GetTaskByUserId(useridstr, status, sortby, order, cursor, limitstr, pagenostr string) ([]models.Task, error)
+}
+
 func NewTaskServices(repo repository.TaskRepo) *TaskServices {
 	return &TaskServices{repo: repo}
 }
