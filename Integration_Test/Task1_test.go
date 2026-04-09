@@ -467,6 +467,152 @@ func TestGetAllUSers_success(t *testing.T){
 
 }
 
+//UpdateTask
+func TestUpdateTask_Success(t *testing.T) {
+
+	db := testutils.SetupTestDb()
+	handler := GetTaskHandler(db)
+
+	body := `{
+		"name": "Updated Task",
+		"status": "done"
+	}`
+
+	req := httptest.NewRequest(http.MethodPatch, "/users/1/tasks/1", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	req.SetPathValue("userid", "1")
+	req.SetPathValue("taskid", "1")
+
+	rec := httptest.NewRecorder()
+
+	handler.UpdateTask(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 got %d", rec.Code)
+	}
+
+	// 🔥 verify DB updated
+	row := db.QueryRow("SELECT name, status FROM tasks1 WHERE id=1 AND userid=1")
+
+	var name, status string
+	row.Scan(&name, &status)
+
+	if name != "Updated Task" || status != "done" {
+		t.Errorf("task not updated properly")
+	}
+}
+
+func TestUpdateTask_InvalidUserid(t *testing.T) {
+
+	db := testutils.SetupTestDb()
+	handler := GetTaskHandler(db)
+
+	body := `{
+		"name": "Updated Task",
+		"status": "done"
+	}`
+
+	req := httptest.NewRequest(http.MethodPatch, "/users/abc/tasks/1", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	req.SetPathValue("userid", "abc")
+	req.SetPathValue("taskid", "1")
+
+	rec := httptest.NewRecorder()
+
+	handler.UpdateTask(rec, req)
+
+	if rec.Code != http.StatusBadRequest{
+		t.Errorf("expected 400 error invalid username but got %d",rec.Code)
+	}
+
+	
+}
+
+func TestUpdateTask_InvalidTaskid(t *testing.T) {
+
+	db := testutils.SetupTestDb()
+	handler := GetTaskHandler(db)
+
+	body := `{
+		"name": "Updated Task",
+		"status": "done"
+	}`
+
+	req := httptest.NewRequest(http.MethodPatch, "/users/1/tasks/abc", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	req.SetPathValue("userid", "1")
+	req.SetPathValue("taskid", "abc")
+
+	rec := httptest.NewRecorder()
+
+	handler.UpdateTask(rec, req)
+
+	if rec.Code != http.StatusBadRequest{
+		t.Errorf("expected 400 error invalid username but got %d",rec.Code)
+	}
+
+	
+}
+
+func TestUpdateTask_NothingToUpdate(t *testing.T) {
+
+	db := testutils.SetupTestDb()
+	handler := GetTaskHandler(db)
+
+	body := `{
+	}`
+
+	req := httptest.NewRequest(http.MethodPatch, "/users/1/tasks/1", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	req.SetPathValue("userid", "1")
+	req.SetPathValue("taskid", "1")
+
+	rec := httptest.NewRecorder()
+
+	handler.UpdateTask(rec, req)
+
+	if rec.Code != http.StatusBadRequest{
+		t.Errorf("expected 400 nothing to update %d",rec.Code)
+	}
+
+	
+}
+
+func TestUpdateTask_NotFound(t *testing.T) {
+
+	db := testutils.SetupTestDb()
+	handler := GetTaskHandler(db)
+
+	body := `{
+		"name": "Updated Task",
+		"status": "done"
+	}`
+
+	req := httptest.NewRequest(http.MethodPatch, "/users/1/tasks/999", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	req.SetPathValue("userid", "1")
+	req.SetPathValue("taskid", "999")
+
+	rec := httptest.NewRecorder()
+
+	handler.UpdateTask(rec, req)
+
+	if rec.Code != http.StatusBadRequest{
+		t.Errorf("expected 400 task not found %d",rec.Code)
+	}
+
+	
+}
+
+
+
+
+
 
 
 
