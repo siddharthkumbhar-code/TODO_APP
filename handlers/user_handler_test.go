@@ -15,7 +15,11 @@ type FakeService struct{
 }
 
 func (m *FakeService) InsertUser(newuser models.Users) error {
-	return m.err
+	if m.err != nil {
+		return m.err
+	}
+	m.users = append(m.users, newuser)
+	return nil
 }
 func(m *FakeService)GetUserById(idstr string) (models.Users, error){
 	if m.err!=nil{
@@ -33,7 +37,7 @@ func(m *FakeService)GetAllUsers() ([]models.Users, error){
 func TestInsertUser_Success(t *testing.T){
 	service:=&FakeService{}
 	handler:=NewUserHandler(service)
-	body := `{"name":"Siddharth","email":"test@gmail.com"}`
+	body := `{"username":"Siddharth","email":"test@gmail.com"}`
 	req := httptest.NewRequest("POST", "/user", strings.NewReader(body))
 	w:=httptest.NewRecorder()
 	handler.InsertUser(w,req)
@@ -82,7 +86,7 @@ func TestInsertUser_ServiceError(t *testing.T) {
 		err: fmt.Errorf("insert failed"),
 	}
 	handler := NewUserHandler(service)
-	body := `{"name":"Siddharth","email":"sid@gmail.com"}`
+	body := `{"username":"Siddharth","email":"sid@gmail.com"}`
 	req := httptest.NewRequest("POST", "/user", strings.NewReader(body))
 	w := httptest.NewRecorder()
 	handler.InsertUser(w, req)
@@ -101,8 +105,6 @@ func TestInsertUser_EmptyFields(t *testing.T) {
 		t.Errorf("Expected 400 got %d", w.Code)
 	}
 }
-
-
 func TestGetAllUsers_Success(t *testing.T) {
 	service := &FakeService{
 		users: []models.Users{
@@ -155,7 +157,6 @@ func TestGetAllUsers_InvalidMethod(t *testing.T){
 		t.Errorf("Expected 405 got %d", w.Code)
 	}
 }
-
 
 func TestGetUserById_Success(t *testing.T) {
 	service := &FakeService{
