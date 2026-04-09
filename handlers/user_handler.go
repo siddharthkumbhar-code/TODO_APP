@@ -37,8 +37,8 @@ func (handler *UserHandler) InsertUser(writer http.ResponseWriter, request *http
 	}
 	err = handler.service.InsertUser(newuser)
 	if err != nil {
-		log.Println("error in service function calling ")
-		http.Error(writer,"Internal Server Error",500)
+		log.Println("error in service function calling ",err)
+			http.Error(writer, "empty username or the email or may be both", 400)
 		return
 	}
 	json.NewEncoder(writer).Encode(map[string]interface{}{
@@ -60,19 +60,15 @@ func (handler *UserHandler) GetUserById(writer http.ResponseWriter, request *htt
 	user, err := handler.service.GetUserById(idstr)
 	if err != nil {
 		log.Println("error in fetching data in handler function", err)
-		http.Error(writer,"Internal server error",500)
-		return
+	 if err.Error()=="sql: no rows in result set"{
+		http.Error(writer,"user not found", http.StatusNotFound)
+	 }else{
+		http.Error(writer,"bad request",http.StatusBadRequest)
+	 }
+
 	}
-	if user.Userid==0{
-		http.Error(writer,"User not found",http.StatusBadRequest)
-		return
-	}
-	json.NewEncoder(writer).Encode(map[string]interface{}{
-		"message":   "the user is ",
-		"username":  user.Username,
-		"userid":    user.Userid,
-		"useremail": user.Email,
-	})
+	log.Println(user.Userid)
+	json.NewEncoder(writer).Encode(user)
 }
 
 func (handler *UserHandler) GetAllUsers(writer http.ResponseWriter, request *http.Request) {
