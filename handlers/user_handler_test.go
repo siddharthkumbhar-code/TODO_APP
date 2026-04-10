@@ -112,7 +112,6 @@ func TestInsertUser_EmptyFields(t *testing.T) {
 		t.Errorf("Expected 400 got %d", w.Code)
 	}
 }
-
 func TestGetAllUsers_Success(t *testing.T) {
 	service := &FakeService{
 		users: []models.Users{

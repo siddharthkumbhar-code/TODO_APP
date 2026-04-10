@@ -56,12 +56,10 @@ func (r *TaskRepository) InsertTask(newtask models.Task) error {
 	query := `INSERT INTO tasks1 (name ,status,userid,createdAt,updatedAt) VALUES(?,?,?,?,?)`
 
 	now := time.Now().UTC().Format(time.RFC3339)
-	log.Println(query, newtask.Name, newtask.Status, newtask.UserId, now, now)
 	_, err := r.db.Exec(query, newtask.Name, newtask.Status, newtask.UserId, now, now)
 
 	if err != nil {
 		log.Println("somthing went wrong to inserting the data ", err)
-		//http.Error(writer,"Error while creating the task",500)
 		return err
 	}
 	return nil
